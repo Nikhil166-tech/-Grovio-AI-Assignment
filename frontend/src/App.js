@@ -144,6 +144,7 @@ function App() {
   /* ===============================
      AUTO SAVE (DEBOUNCED)
   ================================ */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!title && !content) return;
