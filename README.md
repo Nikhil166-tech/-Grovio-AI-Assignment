@@ -238,7 +238,7 @@ Filtering updates in real time.
 
 ## 📸 Demo Video
 
-(Add your Loom / Drive / YouTube demo link here)
+ 
 
 Example:
 
@@ -250,9 +250,6 @@ https://your-demo-link.com
 
 ## 🌐 Live Deployment
 
-(Add deployment link if hosted)
-
-Example:
 
 ```Frontend:
 https://grovio-ai-assignment-i1w4zhbp7-itharajunikhil61-1004s-projects.vercel.app
@@ -280,20 +277,13 @@ npm start
 
 ---
 
-## 📌 Future Improvements
-
-Possible enhancements:
-
-* JWT authentication system
-* Tags and note categories
-* Version history tracking
-* Syntax highlighting for code blocks
-* Cloud database integration
+ 
 
 ---
 
 ## 👨‍💻 Author
-
+ 
 Developed by **Nikhil**
+[[!Gmail] (https://shield.io)](mailto:itharajunikhil16@gmail.com)
 
 Full-stack developer focusing on React, Node.js, and scalable application design.
