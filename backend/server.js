@@ -1,76 +1,86 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
 
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = new sqlite3.Database("./notes.db");
-// Create table
-db.run(`
+// Connect database
+const db = new Database("notes.db");
+
+// Create table if not exists
+db.prepare(`
 CREATE TABLE IF NOT EXISTS notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT,
-    content TEXT
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT,
+  content TEXT
 )
-`);
+`).run();
+
 
 // GET all notes
 app.get("/notes", (req, res) => {
-    db.all("SELECT * FROM notes", [], (err, rows) => {
-        if (err) return res.status(500).json(err);
-        res.json(rows);
-    });
+    try {
+        const notes = db.prepare("SELECT * FROM notes").all();
+        res.json(notes);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch notes" });
+    }
 });
+
 
 // POST create note
 app.post("/notes", (req, res) => {
-    const { title, content } = req.body;
+    try {
+        const { title, content } = req.body;
 
-    db.run(
-        "INSERT INTO notes (title, content) VALUES (?, ?)",
-        [title, content],
-        function (err) {
-            if (err) return res.status(500).json(err);
+        const result = db
+            .prepare("INSERT INTO notes (title, content) VALUES (?, ?)")
+            .run(title, content);
 
-            res.json({
-                id: this.lastID,
-                title,
-                content
-            });
-        }
-    );
+        res.json({
+            id: result.lastInsertRowid,
+            title,
+            content
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to create note" });
+    }
 });
+
 
 // PUT update note
 app.put("/notes/:id", (req, res) => {
-    const { title, content } = req.body;
+    try {
+        const { title, content } = req.body;
 
-    db.run(
-        "UPDATE notes SET title=?, content=? WHERE id=?",
-        [title, content, req.params.id],
-        function (err) {
-            if (err) return res.status(500).json(err);
+        db.prepare(
+            "UPDATE notes SET title = ?, content = ? WHERE id = ?"
+        ).run(title, content, req.params.id);
 
-            res.json({ message: "Updated successfully" });
-        }
-    );
+        res.json({ message: "Updated successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update note" });
+    }
 });
+
 
 // DELETE note
 app.delete("/notes/:id", (req, res) => {
-    db.run(
-        "DELETE FROM notes WHERE id=?",
-        req.params.id,
-        function (err) {
-            if (err) return res.status(500).json(err);
+    try {
+        db.prepare(
+            "DELETE FROM notes WHERE id = ?"
+        ).run(req.params.id);
 
-            res.json({ message: "Deleted successfully" });
-        }
-    );
+        res.json({ message: "Deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete note" });
+    }
 });
+
 
 const PORT = process.env.PORT || 5000;
 
