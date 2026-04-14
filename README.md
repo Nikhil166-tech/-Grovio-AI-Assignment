@@ -254,8 +254,11 @@ https://your-demo-link.com
 
 Example:
 
-```
-https://your-app.vercel.app
+```Frontend:
+https://grovio-ai-assignment-i1w4zhbp7-itharajunikhil61-1004s-projects.vercel.app
+
+Backend:
+https://grovio-ai-assignment-v08m.onrender.com
 ```
 
 ---
