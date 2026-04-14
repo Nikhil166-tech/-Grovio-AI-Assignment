@@ -144,7 +144,7 @@ function App() {
   /* ===============================
      AUTO SAVE (DEBOUNCED)
   ================================ */
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
 
   useEffect(() => {
     if (!title && !content) return;
@@ -158,7 +158,7 @@ function App() {
     }, 1000);
 
     return () => clearTimeout(debounceTimer.current);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, content]);
 
   /* ===============================
