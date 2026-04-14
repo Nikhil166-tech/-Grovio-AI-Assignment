@@ -5,7 +5,6 @@ function Editor({
     content,
     setTitle,
     setContent,
-    saveNote,
     saveStatus
 }) {
     return (
@@ -23,9 +22,7 @@ function Editor({
                 onChange={(e) => setContent(e.target.value)}
             />
 
-
-
-            <p className="save-status color:green">{saveStatus}</p>
+            <p className="save-status">{saveStatus}</p>
 
         </div>
     );

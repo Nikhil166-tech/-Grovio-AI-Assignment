@@ -185,7 +185,7 @@ function App() {
           content={content}
           setTitle={setTitle}
           setContent={setContent}
-          saveNote={saveNote}
+
           saveStatus={saveStatus}
         />
 
