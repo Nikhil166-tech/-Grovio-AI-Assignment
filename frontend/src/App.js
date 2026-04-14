@@ -7,6 +7,13 @@ import Preview from "./components/Preview";
 
 import "./App.css";
 
+/* ===============================
+   BACKEND API URL
+================================ */
+
+const API_URL =
+  "https://grovio-ai-assignment-v08m.onrender.com/notes";
+
 function App() {
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
@@ -16,20 +23,32 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [darkMode, setDarkMode] = useState(false);
 
-  const toggleDarkMode = () => {
-    setDarkMode(prev => !prev);
+  const debounceTimer = useRef(null);
+
+  /* ===============================
+     FETCH NOTES
+  ================================ */
+
+  const fetchNotes = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setNotes(res.data);
+    } catch (error) {
+      console.error("Failed to fetch notes");
+    }
   };
-
-
-  const filteredNotes = notes.filter(note =>
-    (note.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (note.content || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   useEffect(() => {
     fetchNotes();
   }, []);
 
+  /* ===============================
+     DARK MODE
+  ================================ */
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev);
+  };
 
   useEffect(() => {
     if (darkMode) {
@@ -39,15 +58,32 @@ function App() {
     }
   }, [darkMode]);
 
-  const fetchNotes = async () => {
-    const res = await axios.get("http://localhost:5000/notes");
-    setNotes(res.data);
-  };
+  /* ===============================
+     SEARCH FILTER
+  ================================ */
+
+  const filteredNotes = notes.filter(note =>
+    (note.title || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    (note.content || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
+  /* ===============================
+     CREATE NEW NOTE
+  ================================ */
+
   const createNewNote = () => {
     setTitle("");
     setContent("");
     setSelectedId(null);
   };
+
+  /* ===============================
+     SAVE NOTE (CREATE OR UPDATE)
+  ================================ */
 
   const saveNote = async () => {
     if (!title && !content) return;
@@ -56,20 +92,20 @@ function App() {
 
     try {
       if (selectedId) {
-        await axios.put(
-          `http://localhost:5000/notes/${selectedId}`,
-          { title, content }
-        );
+        await axios.put(`${API_URL}/${selectedId}`, {
+          title,
+          content
+        });
       } else {
-        const res = await axios.post(
-          "http://localhost:5000/notes",
-          { title, content }
-        );
+        const res = await axios.post(API_URL, {
+          title,
+          content
+        });
 
         setSelectedId(res.data.id);
       }
 
-      fetchNotes();
+      await fetchNotes();
 
       setSaveStatus("Saved ✓");
 
@@ -82,21 +118,32 @@ function App() {
     }
   };
 
+  /* ===============================
+     SELECT NOTE
+  ================================ */
+
   const selectNote = (note) => {
     setTitle(note.title);
     setContent(note.content);
     setSelectedId(note.id);
   };
 
-  const debounceTimer = useRef(null);
+  /* ===============================
+     DELETE NOTE
+  ================================ */
 
   const deleteNote = async (id) => {
-    await axios.delete(
-      `http://localhost:5000/notes/${id}`
-    );
-
-    fetchNotes();
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      fetchNotes();
+    } catch (error) {
+      console.error("Failed to delete note");
+    }
   };
+
+  /* ===============================
+     AUTO SAVE (DEBOUNCED)
+  ================================ */
 
   useEffect(() => {
     if (!title && !content) return;
@@ -113,6 +160,10 @@ function App() {
 
   }, [title, content]);
 
+  /* ===============================
+     UI LAYOUT
+  ================================ */
+
   return (
     <div className="layout">
 
@@ -124,6 +175,7 @@ function App() {
         setSearchTerm={setSearchTerm}
         darkMode={darkMode}
         toggleDarkMode={toggleDarkMode}
+        selectedId={selectedId}
       />
 
       <div className="editor-preview-container">
@@ -136,7 +188,6 @@ function App() {
           saveNote={saveNote}
           saveStatus={saveStatus}
         />
-
 
         <Preview content={content} />
 
